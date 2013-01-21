@@ -48,6 +48,13 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="hw1\Homework1.html" />
+    <Content Include="hw1\jquery.min.js" />
+    <Content Include="hw1\kendo.all.min.js" />
+    <Content Include="hw1\kendo.common.min.css" />
+    <Content Include="hw1\kendo.default.min.css" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

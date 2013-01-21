@@ -16,13 +16,14 @@ namespace DataMining_uu_2012
 			//let's average it out a hundred times
 			var nums = new List<int>();
 
-			for (var i = 0; i < 100; i++)
+			for (var i = 0; i < 200; i++)
 			{
-				var num = bdp.GenerateRandomNumbers(1000); 
+				var random = new Random();
+				var num = bdp.GenerateRandomNumbers(1000, random); 
 				nums.Add(num);
 				Console.WriteLine(num);	
 			}
-			Console.WriteLine("Average amount was: " + nums.Sum()+ "/" + nums.Count);
+			Console.WriteLine("Average amount was: " + (nums.Sum() / nums.Count));
 			Console.ReadKey();
 		}
 	}

@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>DataMining UU 2013 HW1</title>
+    <script src="jquery.min.js" type="text/javascript"></script>
+    <script src="kendo.all.min.js"></script>
+    <link href="kendo.common.min.css" rel="stylesheet" />
+    <link href="kendo.default.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="example" class="k-content">
+        <div class="chart-wrapper">
+            <h1>QA: Birthday Paradox</h1>
+            <span>K: </span><input type="text" id="nVal" /><input type="button" id="nButton" value="Calculate" />
+            <ul>
+                <li>A: How many random trials does it take for <span id="nUpdateVal">_</span> to repeat? <span id="kResult"></span></li>
+                <li>B: Repeat the experiment m=200 times, and record for each how many random trials this took <span id="m200Times"></span></li>
+            </ul>
+            <div id="chart"></div>
+        </div>
+    </div>
+    <script>
+        function createChart() {
+            $("#chart").kendoChart({
+                theme: $(document).data("kendoSkin") || "default",
+                title: {
+                    text: "Internet Users"
+                },
+                legend: {
+                    position: "bottom"
+                },
+                chartArea: {
+                    background: ""
+                },
+                seriesDefaults: {
+                    type: "area"
+                },
+                series: [{
+                    name: "United States",
+                    data: [67.96, 68.93, 75, 74, 78]
+                }],
+                valueAxis: {
+                    labels: {
+                        format: "{0}%"
+                    }
+                },
+                categoryAxis: {
+                    categories: [2005, 2006, 2007, 2008, 2009]
+                },
+                tooltip: {
+                    visible: true,
+                    format: "{0}%"
+                }
+            });
+        }
+
+        var numberOfTimesToGetDuplicateRandomNumbers = function(n) {
+            var awesomeHash = [];
+            var foundDup = false;
+            while (!foundDup) {
+                var num = Math.floor((Math.random() * n) + 1);
+                for (var i = 0; i < awesomeHash.length; i++) {
+                    if (awesomeHash[i] == num) {
+                        foundDup = true;
+                        break;
+                    }
+                }
+                if (!foundDup) {
+                    awesomeHash.push(num);
+                }
+            }
+
+            return awesomeHash.length;
+        };
+
+        $(document).ready(function () {
+            $("#nButton").click(function(event) {
+                var nVal = $("#nVal").val();
+                $("#nUpdateVal").html(nVal);
+                var kRes = numberOfTimesToGetDuplicateRandomNumbers(nVal);
+                $("#kResult").html(kRes);
+                
+                for (var i = 0; i < 200; i++) {
+                    
+                }
+            });
+
+            setTimeout(function () {
+                createChart();
+
+                // Initialize the chart with a delay to make sure
+                // the initial animation is visible
+            }, 400);
+
+            $(document).bind("kendo:skinChange", function (e) {
+                createChart();
+            });
+        });
+    </script>
+</body>
+</html>
