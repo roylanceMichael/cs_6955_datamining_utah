@@ -13,20 +13,24 @@
     <div id="example" class="k-content">
         <div class="chart-wrapper">
             <h1>QA: Birthday Paradox</h1>
-            <span>K: </span><input type="text" id="nVal" /><input type="button" id="nButton" value="Calculate" />
+            <span>N: </span><input type="text" id="nVal" value="1000" /><span><input type="text" id="mValue" value="200" /></span><input type="button" id="nButton" value="Calculate" />
             <ul>
                 <li>A: How many random trials does it take for <span id="nUpdateVal">_</span> to repeat? <span id="kResult"></span></li>
-                <li>B: Repeat the experiment m=200 times, and record for each how many random trials this took <span id="m200Times"></span></li>
+                <li>B: Repeat the experiment m=<span id="mNumber">_</span> times, and record for each how many random trials this took</li>
+                <li>C: Calculate the empirical expected value of k: <span id="empExpectK">_</span></li>
+                <li>D: This was implemented with Javascript (right click and select "view source" to see the code). The current experiment took: <span id="timeTaken">_</span> milliseconds.</li>
             </ul>
             <div id="chart"></div>
+            <a href="#" id="showResults">Show Raw Results</a>
+            <div id="results"></div>
         </div>
     </div>
     <script>
-        function createChart() {
+        function createChart(xAxis, yAxis) {
             $("#chart").kendoChart({
                 theme: $(document).data("kendoSkin") || "default",
                 title: {
-                    text: "Internet Users"
+                    text: "Number of k"
                 },
                 legend: {
                     position: "bottom"
@@ -38,20 +42,20 @@
                     type: "area"
                 },
                 series: [{
-                    name: "United States",
-                    data: [67.96, 68.93, 75, 74, 78]
+                    name: "percentage",
+                    data: yAxis
                 }],
                 valueAxis: {
                     labels: {
-                        format: "{0}%"
+                        format: "{0}"
                     }
                 },
                 categoryAxis: {
-                    categories: [2005, 2006, 2007, 2008, 2009]
+                    categories: xAxis
                 },
                 tooltip: {
                     visible: true,
-                    format: "{0}%"
+                    format: "{0}"
                 }
             });
         }
@@ -76,23 +80,58 @@
         };
 
         $(document).ready(function () {
-            $("#nButton").click(function(event) {
+            $("#showResults").hide();
+            $("#results").hide();
+            
+            $("#nButton").click(function (event) {
+                event.preventDefault();
+                $("#showResults").show();
                 var nVal = $("#nVal").val();
                 $("#nUpdateVal").html(nVal);
+                
                 var kRes = numberOfTimesToGetDuplicateRandomNumbers(nVal);
                 $("#kResult").html(kRes);
+
+                var hash = new Object();
+                var m = parseInt($("#mValue").val());
+                $("#mNumber").html(m);
                 
-                for (var i = 0; i < 200; i++) {
+                var r = (1 / m);
+                var empiricalValue = 0;
+                var start = new Date().getTime();
+                for (var i = 0; i < m; i++) {
+                    var tempNum = numberOfTimesToGetDuplicateRandomNumbers(nVal);
+                    empiricalValue = empiricalValue + tempNum;
+                    var tRes = new String(tempNum);
                     
+                    if (!hash.hasOwnProperty(tRes)) {
+                        hash[tRes] = r;
+                    } else {
+                        hash[tRes] = hash[tRes] + r;
+                    }
                 }
+                var end = new Date().getTime();
+                var time = end - start;
+                $("#timeTaken").html(time);
+
+                var newX = [];
+                var newY = [];
+                var empExpectK = (empiricalValue / m);
+                $("#empExpectK").html(empExpectK);
+                $("#results").html("");
+                
+                for (var propName in hash) {
+                    newX.push(propName);
+                    newY.push(hash[propName]);
+                    $("#results").append("<div>" + propName + " : " + hash[propName] + "</div>");
+                }
+                createChart(newX, newY);
             });
 
-            setTimeout(function () {
-                createChart();
-
-                // Initialize the chart with a delay to make sure
-                // the initial animation is visible
-            }, 400);
+            $("#showResults").click(function(event) {
+                event.preventDefault();
+                $("#results").toggle();
+            });
 
             $(document).bind("kendo:skinChange", function (e) {
                 createChart();
