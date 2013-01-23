@@ -12,7 +12,7 @@
 <body>
     <div id="example" class="k-content">
         <div class="chart-wrapper">
-            <h1>QA: Birthday Paradox</h1>
+            <h1>Q1: Birthday Paradox</h1>
             <span>N: </span><input type="text" id="nVal" value="1000" /><span><input type="text" id="mValue" value="200" /></span><input type="button" id="nButton" value="Calculate" />
             <ul>
                 <li>A: How many random trials does it take for <span id="nUpdateVal">_</span> to repeat? <span id="kResult"></span></li>
@@ -23,14 +23,25 @@
             <div id="chart"></div>
             <a href="#" id="showResults">Show Raw Results</a>
             <div id="results"></div>
+            <h2>Q2: Coupon Collectors</h2>
+            <span>N: </span><input type="text" id="couponNSize" value="60"/> <input type="button" id="q2Button" value="Calculate"/>
+            <ul>
+                <li>A: Generate random numbers in the domain [n] until every value i is in [n]. k=<span id="q2FirstAnswer">_</span></li>
+                <li>B: Largest bar? <span id="largestBar">_</span></li>
+                <li>C: Repeat step A for m=300.</li>
+                <li>D: Calculate the empirical value of k: <span id="empExpectKCoupon">_</span></li>
+                <li>E: This was done in Javascript, the code is in the source. n=60, m=300 took <span id="timeTakenCoupon">_</span> milliseconds.</li>
+            </ul>
+            <div id="couponChart"></div>
+            <div id="couponDensity"></div>
         </div>
     </div>
     <script>
-        function createChart(xAxis, yAxis) {
-            $("#chart").kendoChart({
+        var createChart = function(xAxis, yAxis, id) {
+            $(id).kendoChart({
                 theme: $(document).data("kendoSkin") || "default",
                 title: {
-                    text: "Number of k"
+                    text: ""
                 },
                 legend: {
                     position: "bottom"
@@ -58,25 +69,69 @@
                     format: "{0}"
                 }
             });
-        }
+        };
 
         var numberOfTimesToGetDuplicateRandomNumbers = function(n) {
-            var awesomeHash = [];
+            var awesomeArray = [];
             var foundDup = false;
             while (!foundDup) {
                 var num = Math.floor((Math.random() * n) + 1);
-                for (var i = 0; i < awesomeHash.length; i++) {
-                    if (awesomeHash[i] == num) {
+                for (var i = 0; i < awesomeArray.length; i++) {
+                    if (awesomeArray[i] == num) {
                         foundDup = true;
                         break;
                     }
                 }
                 if (!foundDup) {
-                    awesomeHash.push(num);
+                    awesomeArray.push(num);
                 }
             }
 
-            return awesomeHash.length;
+            return awesomeArray.length;
+        };
+
+        var areAnyValuesStillZero = function(awesomeArray) {
+            //check entire array again, probably a better way to do this...
+            var tempFull = true;
+            
+            for (var j = 0; j < awesomeArray.length; j++) {
+                if (awesomeArray[j] == 0) {
+                    tempFull = false;
+                    break;
+                }
+            }
+            
+            return tempFull;
+        };
+
+        var generateRandomNumbersUntilEveryValueFilled = function (n) {
+            var resultsArray = [];
+            var numArray = [];
+
+            //initialize array
+            for (var i = 0; i < n; i++) {
+                resultsArray[i] = 0;
+                numArray[i] = i;
+            }
+            
+            var totalTries = 0;
+            var full = false;
+            
+            while (!full) {
+                var num = Math.floor((Math.random() * n));
+                
+                if (resultsArray.length > num) {
+                    
+                    totalTries = totalTries + 1;
+                    resultsArray[num] = resultsArray[num] + 1;
+                    
+                    if (areAnyValuesStillZero(resultsArray)) {
+                        full = true;
+                    }
+                }
+            }
+            
+            return [totalTries, resultsArray, numArray];
         };
 
         $(document).ready(function () {
@@ -125,12 +180,72 @@
                     newY.push(hash[propName]);
                     $("#results").append("<div>" + propName + " : " + hash[propName] + "</div>");
                 }
-                createChart(newX, newY);
+                
+                createChart(newX, newY, "#chart");
             });
 
             $("#showResults").click(function(event) {
                 event.preventDefault();
                 $("#results").toggle();
+            });
+
+            $("#q2Button").click(function(event) {
+                event.preventDefault();
+                
+                $("#q2FirstAnswer").html("");
+
+                var n = parseInt($("#couponNSize").val());
+
+                var res = generateRandomNumbersUntilEveryValueFilled(n);
+
+                
+
+                var biggest = 0;
+                var location = 0;
+                for (var i = 0; i < res[1].length; i++) {
+                    if (res[1][i] > biggest) {
+                        biggest = res[1][i];
+                        location = i;
+                    }
+                }
+                
+                $("#largestBar").html(biggest + " @ " + location);
+                $("#q2FirstAnswer").html(res[0]);
+                createChart(res[2], res[1], "#couponChart");
+                
+                //repeat m=300 times
+                var m = 300;
+                var r = (1 / m);
+                var empiricalValue = 0;
+                var hash = new Object();
+                var start = new Date().getTime();
+                for (var j = 0; j < m; j++) {
+                    var tempNum = generateRandomNumbersUntilEveryValueFilled(n)[0];
+                    empiricalValue = empiricalValue + tempNum;
+
+                    var tRes = new String(tempNum);
+
+                    if (!hash.hasOwnProperty(tRes)) {
+                        hash[tRes] = r;
+                    } else {
+                        hash[tRes] = hash[tRes] + r;
+                    }
+                }
+                var end = new Date().getTime();
+                var diff = end - start;
+                $("#timeTakenCoupon").html(diff);
+                var newX = [];
+                var newY = [];
+                var empExpectK = (empiricalValue / m);
+                
+                for (var propName in hash) {
+                    newX.push(propName);
+                    newY.push(hash[propName]);
+                }
+
+                $("#empExpectKCoupon").html(empExpectK);
+                createChart(newX, newY, "#couponDensity");
+
             });
 
             $(document).bind("kendo:skinChange", function (e) {
