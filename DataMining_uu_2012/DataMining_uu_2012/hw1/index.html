@@ -17,11 +17,18 @@
             <ul>
                 <li>A: How many random trials does it take for <span id="nUpdateVal">_</span> to repeat? <span id="kResult"></span></li>
                 <li>B: Repeat the experiment m=<span id="mNumber">_</span> times, and record for each how many random trials this took</li>
-                <li>C: Calculate the empirical expected value of k: <span id="empExpectK">_</span></li>
-                <li>D: This was implemented with Javascript (right click and select "view source" to see the code). The current experiment took: <span id="timeTaken">_</span> milliseconds.</li>
+                <li>C: Calculate the empirical expected value of k: <span class="empExpectK">_</span></li>
+                <li>D: This was implemented with Javascript (right click and select "view source" to see the code). It's implemented in the function called "numberOfTimesToGetDuplicateRandomNumbers". Basically, I create a set and keep adding random numbers into it until I get a duplicate. The current experiment took: <span id="timeTaken">_</span> milliseconds.</li>
+                <li>I estimate that this would take about 5300 milliseconds. The reason is because I'm getting the following results:
+                    <ul>
+                        <li>n=1,000,000, m=100: 608 milliseconds</li>
+                        <li>n=1,000,000, m=200: 1114 milliseconds</li>
+                        <li>n=1,000,000, m=400: 2124 milliseconds</li>
+                        <li>n=1,000,000, m=800: 4338 milliseconds</li>
+                    </ul>
+                </li>
             </ul>
             <div id="chart"></div>
-            <a href="#" id="showResults">Show Raw Results</a>
             <div id="results"></div>
             <h2>Q2: Coupon Collectors</h2>
             <span>N: </span><input type="text" id="couponNSize" value="60"/> <input type="text" value="300" id="couponMSize"/> <input type="button" id="q2Button" value="Calculate"/>
@@ -29,11 +36,27 @@
                 <li>A: Generate random numbers in the domain [n] until every value i is in [n]. k=<span id="q2FirstAnswer">_</span></li>
                 <li>B: Largest bar? <span id="largestBar">_</span></li>
                 <li>C: Repeat step A for m=300.</li>
-                <li>D: Calculate the empirical value of k: <span id="empExpectKCoupon">_</span></li>
-                <li>E: This was done in Javascript, the code is in the source. n=60, m=300 took <span id="timeTakenCoupon">_</span> milliseconds.</li>
+                <li>D: Calculate the empirical value of k: <span class="empExpectKCoupon">_</span></li>
+                <li>E: This was done in Javascript, the code is in the source. n=60, m=300 took <span id="timeTakenCoupon">_</span> milliseconds. The algorithm is simple, I keep a hash of numbers (0..n) and its value as the number of times it was called. It's a little slow right now because I have to search through the array every time I add a new random number to see if we've filled all the buckets. A better way would be to have a pure hash table where I could count how many keys are in it, and when the key size gets to n we know we have reached our limit. This would dramatically speed up the program.</li>
+                <li>I estimate that n=10,000, m=10,000 would take approximately ~2,400,000 milliseconds. The reason is because I'm getting the following results:
+                    <ul>
+                        <li>n=10,000, m=200: ~44,000 milliseconds</li>
+                        <li>n=10,000, m=400: ~88,000 milliseconds</li>
+                        <li>n=10,000, m=800: ~180,000 milliseconds</li>
+                        <li>n=10,000, m=1,600: ~360,000 milliseconds</li>
+                        <li>n=10,000, m=3,200: ~720,000 milliseconds</li>
+                        <li>n=10,000, m=6,400: ~1,440,000 milliseconds</li>
+                        <li>n=10,000, m=12,000: ~2,880,000 millisecondss</li>
+                    </ul>
+                </li>
             </ul>
             <div id="couponChart"></div>
             <div id="couponDensity"></div>
+            <h2>Q3: Analysis</h2>
+            <ul>
+                <li>A: <img alt="Latex equation" src="analysisA.gif" />, this compares with my answer of <span class="empExpectK"></span></li>
+                <li>B: <img alt="Latex equation" src="analysisB.gif" />, this compares with my answer of <span class="empExpectKCoupon"></span></li>
+            </ul>
         </div>
     </div>
     <script>
@@ -140,7 +163,6 @@
             
             $("#nButton").click(function (event) {
                 event.preventDefault();
-                $("#showResults").show();
                 var nVal = $("#nVal").val();
                 $("#nUpdateVal").html(nVal);
                 
@@ -172,22 +194,16 @@
                 var newX = [];
                 var newY = [];
                 var empExpectK = (empiricalValue / m);
-                $("#empExpectK").html(empExpectK);
+                $(".empExpectK").html(empExpectK);
                 $("#results").html("");
                 var runningTotal = 0;
                 for (var propName in hash) {
                     newX.push(propName);
                     runningTotal = runningTotal + hash[propName];
                     newY.push(runningTotal);
-                    $("#results").append("<div>" + propName + " : " + runningTotal + "</div>");
                 }
                 
                 createChart(newX, newY, "#chart");
-            });
-
-            $("#showResults").click(function(event) {
-                event.preventDefault();
-                $("#results").toggle();
             });
 
             $("#q2Button").click(function(event) {
@@ -198,8 +214,6 @@
                 var n = parseInt($("#couponNSize").val());
 
                 var res = generateRandomNumbersUntilEveryValueFilled(n);
-
-                
 
                 var biggest = 0;
                 var location = 0;
@@ -245,7 +259,7 @@
                     newY.push(runningTotal);
                 }
 
-                $("#empExpectKCoupon").html(empExpectK);
+                $(".empExpectKCoupon").html(empExpectK);
                 createChart(newX, newY, "#couponDensity");
 
             });

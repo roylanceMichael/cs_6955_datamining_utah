@@ -49,6 +49,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="hw1\analysisA.gif" />
+    <Content Include="hw1\analysisB.gif" />
     <Content Include="hw1\index.html" />
     <Content Include="hw1\jquery.min.js" />
     <Content Include="hw1\kendo.all.min.js" />
