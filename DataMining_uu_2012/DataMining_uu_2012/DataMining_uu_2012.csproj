@@ -32,8 +32,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,11 +50,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="hw1\BirthdayParadox.cs" />
+    <Compile Include="hw2\Hw2.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="project\Bloomberg.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="hw1\analysisA.gif" />
@@ -56,6 +67,10 @@
     <Content Include="hw1\kendo.all.min.js" />
     <Content Include="hw1\kendo.common.min.css" />
     <Content Include="hw1\kendo.default.min.css" />
+    <EmbeddedResource Include="hw2\D1.txt" />
+    <EmbeddedResource Include="hw2\D2.txt" />
+    <EmbeddedResource Include="hw2\D3.txt" />
+    <EmbeddedResource Include="hw2\D4.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
