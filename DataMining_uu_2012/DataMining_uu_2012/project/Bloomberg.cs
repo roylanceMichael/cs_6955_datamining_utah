@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace DataMining_uu_2012.project
 {
 	using System.Net;
+	using System.Text.RegularExpressions;
 
 	using HtmlAgilityPack;
 
@@ -75,6 +76,38 @@ namespace DataMining_uu_2012.project
 
 				return individualLinks;
 			}
+		}
+
+		public static CompanyInfo GetCompanyInfo(string url)
+		{
+			using (var webClient = new WebClient())
+			{
+				var webPage = webClient.DownloadString(url);
+				var doc = new HtmlDocument();
+				doc.LoadHtml(webPage);
+				var res = doc.DocumentNode.SelectSingleNode("//table[@class='snapshot_table']");
+				if (res != null)
+				{
+					var rawText = Regex.Split(res.InnerText.Trim(), "\\s+");
+					if (rawText.Length > 19)
+					{
+						var ci = new CompanyInfo
+											 {
+												 Url = url,
+												 Open = rawText[1],
+												 TodayRangeLower = rawText[4],
+												 TodayRangeUpper = rawText[6],
+												 PrevClose = rawText[8],
+												 Volume = rawText[11],
+												 YearRangeLower = rawText[14],
+												 YearRangeUpper = rawText[16],
+												 YearReturn = rawText[19]
+											 };
+						return ci;
+					}
+				}
+			}
+			return new CompanyInfo();
 		}
 	}
 }
