@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace DataMining_uu_2012
 {
 	using System.IO;
+	using System.Threading;
 
 	using DataMining_uu_2012.hw1;
 	using DataMining_uu_2012.hw2;
@@ -70,28 +71,39 @@ namespace DataMining_uu_2012
 			}
 		}
 
+		static void ProcessAllCompanies(IEnumerable<string> urls, string newDirectory)
+		{
+			foreach (var item in urls)
+			{
+				Console.WriteLine("Processing " + item);
+				var companyInfo = Bloomberg.GetCompanyInfo(item);
+				var serializedItem = JsonConvert.SerializeObject(companyInfo, Formatting.Indented);
+				using (var newFile = File.CreateText(Path.Combine(newDirectory, companyInfo.CompanyHandle.CleanseFileName() + ".json")))
+				{
+					newFile.Write(serializedItem);
+					newFile.Close();
+				}
+			}
+		}
+
 		static void Main(string[] args)
 		{
 			if (args != null && args.Length > 0 && args.Any(t => t == "Bloomberg"))
 			{
-				var fileLocation = Directory.GetCurrentDirectory();
-
-				var newDirectory = Path.Combine(fileLocation,  DateTime.Now.ToFileTimeUtc().ToString());
-
-				Directory.CreateDirectory(newDirectory);
-				
+				Console.WriteLine("Getting all the companies...");	
 				var res = Bloomberg.GetAllCompanies();
-				foreach (var item in res)
-				{
-					var companyInfo = Bloomberg.GetCompanyInfo(item);
-					var serializedItem = JsonConvert.SerializeObject(companyInfo, Formatting.Indented);
-					using (var newFile = File.CreateText(Path.Combine(newDirectory, companyInfo.CompanyHandle.CleanseFileName() + ".json")))
-					{
-						newFile.Write(serializedItem);
-						newFile.Close();
-					}
-				}
 
+				//this is going to go once every three hours
+				while (true)
+				{
+					var fileLocation = Directory.GetCurrentDirectory();
+					var newDirectory = Path.Combine(fileLocation, DateTime.Now.ToFileTimeUtc().ToString());
+					Directory.CreateDirectory(newDirectory);
+					ProcessAllCompanies(res, newDirectory);
+					Console.WriteLine("Complete! Now going to sleep for three hours...");
+					//sleep for three hours...
+					Thread.Sleep(new TimeSpan(0, 3, 0, 0, 0));
+				}
 				return;
 			}
 
