@@ -77,6 +77,12 @@ namespace DataMining_uu_2012
 			{
 				Console.WriteLine("Processing " + item);
 				var companyInfo = Bloomberg.GetCompanyInfo(item);
+				
+				if (companyInfo == null)
+				{
+					continue;
+				}
+
 				var serializedItem = JsonConvert.SerializeObject(companyInfo, Formatting.Indented);
 				using (var newFile = File.CreateText(Path.Combine(newDirectory, companyInfo.CompanyHandle.CleanseFileName() + ".json")))
 				{
@@ -88,42 +94,39 @@ namespace DataMining_uu_2012
 
 		static void Main(string[] args)
 		{
-			if (args != null && args.Length > 0 && args.Any(t => t == "Bloomberg"))
+			var argsNotNull = args != null;
+			if (argsNotNull && args.Length > 0 && args.Any(t => t == "Bloomberg"))
 			{
-				Console.WriteLine("Getting all the companies...");	
-				var res = Bloomberg.GetAllCompanies();
-
-				//this is going to go once every three hours
-				while (true)
-				{
-					var fileLocation = Directory.GetCurrentDirectory();
-					var newDirectory = Path.Combine(fileLocation, DateTime.Now.ToFileTimeUtc().ToString());
-					Directory.CreateDirectory(newDirectory);
-					ProcessAllCompanies(res, newDirectory);
-					Console.WriteLine("Complete! Now going to sleep for three hours...");
-					//sleep for three hours...
-					Thread.Sleep(new TimeSpan(0, 3, 0, 0, 0));
-				}
-				return;
+				BloombergFunc();
 			}
+			else if (argsNotNull && args.Any(t => t == "Hw2"))
+			{
+				var hw2 = new Hw2();
+				HowManyDistinctNgrams(hw2);
+				CalculateJaccard(hw2);
+				var mult = new MultiplicativeHash();
+				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				Console.ReadLine();
+			}
+		}
 
-			var hw2 = new Hw2();
-			HowManyDistinctNgrams(hw2);
-			CalculateJaccard(hw2);
-			Console.ReadLine();
-			//var bdp = new BirthdayParadox();
-			////let's average it out a hundred times
-			//var nums = new List<int>();
+		private static void BloombergFunc()
+		{
+			Console.WriteLine("Getting all the companies...");
+			var res = Bloomberg.GetAllCompanies();
 
-			//for (var i = 0; i < 200; i++)
-			//{
-			//	var random = new Random();
-			//	var num = bdp.GenerateRandomNumbers(1000, random); 
-			//	nums.Add(num);
-			//	Console.WriteLine(num);	
-			//}
-			//Console.WriteLine("Average amount was: " + (nums.Sum() / nums.Count));
-			//Console.ReadKey();
+			//this is going to go once every three hours
+			while (true)
+			{
+				var fileLocation = Directory.GetCurrentDirectory();
+				var newDirectory = Path.Combine(fileLocation, DateTime.Now.ToFileTimeUtc().ToString());
+				Directory.CreateDirectory(newDirectory);
+				ProcessAllCompanies(res, newDirectory);
+				Console.WriteLine("Complete! Now going to sleep for three hours...");
+				//sleep for three hours...
+				Thread.Sleep(new TimeSpan(0, 3, 0, 0, 0));
+			}
+			return;
 		}
 	}
 }

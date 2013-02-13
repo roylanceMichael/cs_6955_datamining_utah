@@ -82,7 +82,16 @@ namespace DataMining_uu_2012.project
 		{
 			using (var webClient = new WebClient())
 			{
-				var webPage = webClient.DownloadString(url);
+				string webPage;
+				try
+				{
+					webPage = webClient.DownloadString(url);
+				}
+				catch (Exception)
+				{
+					return null;
+				}
+				
 				var doc = new HtmlDocument();
 				doc.LoadHtml(webPage);
 				var res = doc.DocumentNode.SelectSingleNode("//table[@class='snapshot_table']");

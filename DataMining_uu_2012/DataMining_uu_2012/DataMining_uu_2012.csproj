@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="hw1\BirthdayParadox.cs" />
     <Compile Include="hw2\Hw2.cs" />
+    <Compile Include="hw2\MultiplicativeHash.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="project\Bloomberg.cs" />
     <Compile Include="project\BloombergContext.cs" />
