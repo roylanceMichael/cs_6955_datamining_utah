@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataMining_uu_2012
 {
+	using System.Diagnostics;
 	using System.IO;
 	using System.Threading;
 
@@ -77,7 +78,7 @@ namespace DataMining_uu_2012
 			{
 				Console.WriteLine("Processing " + item);
 				var companyInfo = Bloomberg.GetCompanyInfo(item);
-				
+
 				if (companyInfo == null)
 				{
 					continue;
@@ -105,9 +106,85 @@ namespace DataMining_uu_2012
 				HowManyDistinctNgrams(hw2);
 				CalculateJaccard(hw2);
 				var mult = new MultiplicativeHash();
-				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+
+				BigramMinHashing(mult, hw2);
+
 				Console.ReadLine();
 			}
+		}
+
+		private static void BigramMinHashing(MultiplicativeHash mult, Hw2 hw2)
+		{
+			var stopWatch = new Stopwatch();
+			double tenDist = 0;
+			stopWatch.Start();
+			for (var i = 0; i < 10; i++)
+			{
+				tenDist = BigramMinHash(mult, hw2, tenDist);
+			}
+			stopWatch.Stop();
+			
+			tenDist = tenDist / 10;
+			Console.WriteLine("10: " + tenDist + " " + stopWatch.Elapsed.Milliseconds);
+			stopWatch.Reset();
+
+			double fiftyDist = 0;
+			stopWatch.Start();
+			for (var i = 0; i < 50; i++)
+			{
+				fiftyDist = BigramMinHash(mult, hw2, fiftyDist);
+			}
+			stopWatch.Stop();
+			fiftyDist = fiftyDist / 50;
+			Console.WriteLine("50: " + fiftyDist + " " + stopWatch.Elapsed.Milliseconds);
+
+			double hundredDist = 0;
+			stopWatch.Reset();
+			stopWatch.Start();
+
+			for (var i = 0; i < 100; i++)
+			{
+				hundredDist = BigramMinHash(mult, hw2, hundredDist);
+			}
+			stopWatch.Stop();
+			hundredDist = hundredDist / 100;
+			Console.WriteLine("100: " + hundredDist + " " + stopWatch.Elapsed.Milliseconds);
+			
+			stopWatch.Reset();
+			double threeHundred = 0;
+			stopWatch.Start();
+			for (var i = 0; i < 300; i++)
+			{
+				threeHundred = BigramMinHash(mult, hw2, threeHundred);
+			}
+			stopWatch.Stop();
+			threeHundred = threeHundred / 300;
+			Console.WriteLine("300: " + threeHundred + " " + stopWatch.Elapsed.Milliseconds);
+
+			double sixHundred = 0;
+			stopWatch.Reset();
+			stopWatch.Start();
+			for (var i = 0; i < 600; i++)
+			{
+				sixHundred = BigramMinHash(mult, hw2, sixHundred);
+			}
+			stopWatch.Stop();
+			sixHundred = sixHundred / 600;
+			Console.WriteLine("600: " + sixHundred + " " + stopWatch.Elapsed.Milliseconds);
+
+			Console.WriteLine(
+				"Bigram for d1 and d2 is: " + tenDist + " " + fiftyDist + " " + hundredDist + " " + threeHundred + " "
+				+ sixHundred);
+		}
+
+		private static double BigramMinHash(MultiplicativeHash mult, Hw2 hw2, double dist)
+		{
+			var res = mult.BigramMinHashing(hw2.D1Bigrams, hw2.D2Bigrams);
+			if (res)
+			{
+				dist++;
+			}
+			return dist;
 		}
 
 		private static void BloombergFunc()
@@ -126,7 +203,128 @@ namespace DataMining_uu_2012
 				//sleep for three hours...
 				Thread.Sleep(new TimeSpan(0, 3, 0, 0, 0));
 			}
-			return;
 		}
 	}
 }
+
+/*
+ * private static void UnigramMinHashing(MultiplicativeHash mult, Hw2 hw2)
+		{
+			double uniTenDist = 0;
+			for (var i = 0; i < 10; i++)
+			{
+				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				if (res)
+				{
+					uniTenDist++;
+				}
+			}
+
+			uniTenDist = uniTenDist / 10;
+
+			double uniFiftyDist = 0;
+			for (var i = 0; i < 50; i++)
+			{
+				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				if (res)
+				{
+					uniFiftyDist++;
+				}
+			}
+			uniFiftyDist = uniFiftyDist / 50;
+
+			double uniHundredDist = 0;
+			for (var i = 0; i < 100; i++)
+			{
+				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				if (res)
+				{
+					uniHundredDist++;
+				}
+			}
+
+			uniHundredDist = uniHundredDist / 100;
+
+			double uniThreeHundred = 0;
+			for (var i = 0; i < 300; i++)
+			{
+				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				if (res)
+				{
+					uniThreeHundred++;
+				}
+			}
+
+			uniThreeHundred = uniThreeHundred / 300;
+
+			double uniSixHundred = 0;
+			for (var i = 0; i < 600; i++)
+			{
+				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				if (res)
+				{
+					uniSixHundred++;
+				}
+			}
+			uniSixHundred = uniSixHundred / 600;
+
+			Console.WriteLine(
+				"Unigram for d1 and d2 is: " + uniTenDist + " " + uniFiftyDist + " " + uniHundredDist + " " + uniThreeHundred + " "
+				+ uniSixHundred);
+		}
+
+		private static void TrigramMinHashing(MultiplicativeHash mult, Hw2 hw2)
+		{
+			double tenDist = 0;
+			for (var i = 0; i < 10; i++)
+			{
+				tenDist = TrigramMinHash(mult, hw2, tenDist);
+			}
+
+			tenDist = tenDist / 10;
+
+			double fiftyDist = 0;
+			for (var i = 0; i < 50; i++)
+			{
+				fiftyDist = TrigramMinHash(mult, hw2, fiftyDist);
+			}
+			fiftyDist = fiftyDist / 50;
+
+			double hundredDist = 0;
+			for (var i = 0; i < 100; i++)
+			{
+				hundredDist = TrigramMinHash(mult, hw2, hundredDist);
+			}
+
+			hundredDist = hundredDist / 100;
+
+			double threeHundred = 0;
+			for (var i = 0; i < 300; i++)
+			{
+				threeHundred = TrigramMinHash(mult, hw2, threeHundred);
+			}
+
+			threeHundred = threeHundred / 300;
+
+			double sixHundred = 0;
+			for (var i = 0; i < 600; i++)
+			{
+				sixHundred = TrigramMinHash(mult, hw2, sixHundred);
+			}
+			sixHundred = sixHundred / 600;
+
+			Console.WriteLine(
+				"Trigram for d1 and d2 is: " + tenDist + " " + fiftyDist + " " + hundredDist + " " + threeHundred + " "
+				+ sixHundred);
+		}
+
+		private static double TrigramMinHash(MultiplicativeHash mult, Hw2 hw2, double dis)
+		{
+			var res = mult.TrigramMinHashing(hw2.D1Trigrams, hw2.D2Trigrams);
+			if (res)
+			{
+				dis++;
+			}
+			return dis;
+		}
+ * */
