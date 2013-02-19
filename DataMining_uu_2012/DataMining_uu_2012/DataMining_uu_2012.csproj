@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="hw1\BirthdayParadox.cs" />
+    <Compile Include="hw2\Document.cs" />
     <Compile Include="hw2\Hw2.cs" />
     <Compile Include="hw2\MultiplicativeHash.cs" />
     <Compile Include="Program.cs" />

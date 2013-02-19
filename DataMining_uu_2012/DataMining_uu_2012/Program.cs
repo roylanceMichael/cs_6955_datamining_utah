@@ -23,24 +23,26 @@ namespace DataMining_uu_2012
 		{
 			var statements = new List<string>
 				                     {
-					                     "d1d2Uni: " + Hw2.JaccardUnigram(hw2.D1Unigrams, hw2.D2Unigrams),
-															 "d1d3Uni: " + Hw2.JaccardUnigram(hw2.D1Unigrams, hw2.D3Unigrams),
-															 "d1d4Uni: " + Hw2.JaccardUnigram(hw2.D1Unigrams, hw2.D4Unigrams),
-															 "d2d3Uni: " + Hw2.JaccardUnigram(hw2.D2Unigrams, hw2.D3Unigrams),
-															 "d2d4Uni: " + Hw2.JaccardUnigram(hw2.D2Unigrams, hw2.D4Unigrams),
-															 "d3d4Uni: " + Hw2.JaccardUnigram(hw2.D3Unigrams, hw2.D4Unigrams),
-															 "d1d2Bi: " + Hw2.JaccardBigram(hw2.D1Bigrams, hw2.D2Bigrams),
-															 "d1d3Bi: " + Hw2.JaccardBigram(hw2.D1Bigrams, hw2.D3Bigrams),
-															 "d1d4Bi: " + Hw2.JaccardBigram(hw2.D1Bigrams, hw2.D4Bigrams),
-															 "d2d3Bi: " + Hw2.JaccardBigram(hw2.D2Bigrams, hw2.D3Bigrams),
-															 "d2d4Bi: " + Hw2.JaccardBigram(hw2.D2Bigrams, hw2.D4Bigrams),
-															 "d3d4Bi: " + Hw2.JaccardBigram(hw2.D3Bigrams, hw2.D4Bigrams),
-															 "d1d2Tri: " +  Hw2.JaccardTrigram(hw2.D1Trigrams, hw2.D2Trigrams),
-															 "d1d3Tri: " +  Hw2.JaccardTrigram(hw2.D1Trigrams, hw2.D3Trigrams),
-															 "d1d4Tri: " + Hw2.JaccardTrigram(hw2.D1Trigrams, hw2.D4Trigrams), 
-															 "d2d3Tri: " + Hw2.JaccardTrigram(hw2.D2Trigrams, hw2.D3Trigrams),
-															 "d2d4Tri: " + Hw2.JaccardTrigram(hw2.D2Trigrams, hw2.D4Trigrams),
-															 "d3d4Tri: " + Hw2.JaccardTrigram(hw2.D3Trigrams, hw2.D4Trigrams)
+															 "[G1] d1d2Bi: " +  Hw2.JaccardBigramChars(hw2.D1.BigramChars, hw2.D2.BigramChars),
+															 "[G1] d1d3Bi: " +  Hw2.JaccardBigramChars(hw2.D1.BigramChars, hw2.D3.BigramChars),
+															 "[G1] d1d4Bi: " + Hw2.JaccardBigramChars(hw2.D1.BigramChars, hw2.D4.BigramChars), 
+															 "[G1] d2d3Bi: " + Hw2.JaccardBigramChars(hw2.D2.BigramChars, hw2.D3.BigramChars),
+															 "[G1] d2d4Bi: " + Hw2.JaccardBigramChars(hw2.D2.BigramChars, hw2.D4.BigramChars),
+															 "[G1] d3d4Bi: " + Hw2.JaccardBigramChars(hw2.D3.BigramChars, hw2.D4.BigramChars),
+
+															 "[G2] d1d2Bi: " +  Hw2.JaccardTrigramChars(hw2.D1.TrigramChars, hw2.D2.TrigramChars),
+															 "[G2] d1d3Bi: " +  Hw2.JaccardTrigramChars(hw2.D1.TrigramChars, hw2.D3.TrigramChars),
+															 "[G2] d1d4Bi: " + Hw2.JaccardTrigramChars(hw2.D1.TrigramChars, hw2.D4.TrigramChars), 
+															 "[G2] d2d3Bi: " + Hw2.JaccardTrigramChars(hw2.D2.TrigramChars, hw2.D3.TrigramChars),
+															 "[G2] d2d4Bi: " + Hw2.JaccardTrigramChars(hw2.D2.TrigramChars, hw2.D4.TrigramChars),
+															 "[G2] d3d4Bi: " + Hw2.JaccardTrigramChars(hw2.D3.TrigramChars, hw2.D4.TrigramChars),
+
+															 "[G3] d1d2Tri: " +  Hw2.JaccardTrigramWords(hw2.D1.TrigramsWords, hw2.D2.TrigramsWords),
+															 "[G3] d1d3Tri: " +  Hw2.JaccardTrigramWords(hw2.D1.TrigramsWords, hw2.D3.TrigramsWords),
+															 "[G3] d1d4Tri: " + Hw2.JaccardTrigramWords(hw2.D1.TrigramsWords, hw2.D4.TrigramsWords), 
+															 "[G3] d2d3Tri: " + Hw2.JaccardTrigramWords(hw2.D2.TrigramsWords, hw2.D3.TrigramsWords),
+															 "[G3] d2d4Tri: " + Hw2.JaccardTrigramWords(hw2.D2.TrigramsWords, hw2.D4.TrigramsWords),
+															 "[G3] d3d4Tri: " + Hw2.JaccardTrigramWords(hw2.D3.TrigramsWords, hw2.D4.TrigramsWords)
 				                     };
 
 			foreach (var statement in statements)
@@ -53,18 +55,18 @@ namespace DataMining_uu_2012
 		{
 			var statements = new List<string>
 				                 {
-					                 "d1Uni: " + hw2.D1Unigrams.Keys.Count,
-													 "d1Bi: " + hw2.D1Bigrams.Keys.Count,
-													 "d1Tri: " + hw2.D1Trigrams.Keys.Count,
-													 "d2Uni: " + hw2.D2Unigrams.Keys.Count,
-													 "d2Bi: " + hw2.D2Bigrams.Keys.Count,
-													 "d2Tri: " + hw2.D2Trigrams.Keys.Count,
-													 "d3Uni: " + hw2.D3Unigrams.Keys.Count,
-													 "d3Bi: " + hw2.D3Bigrams.Keys.Count,
-													 "d3Tri: " + hw2.D3Trigrams.Keys.Count,
-													 "d4Uni: " + hw2.D4Unigrams.Keys.Count,
-													 "d4Bi: " + hw2.D4Bigrams.Keys.Count,
-													 "d4Tri: " + hw2.D4Trigrams.Keys.Count
+					                 "[G1] d1BiChar: " + hw2.D1.BigramChars.Keys.Count,
+													 "[G2] d1TriChar: " + hw2.D1.TrigramChars.Keys.Count,
+													 "[G3] d1TriWord: " + hw2.D1.TrigramsWords.Keys.Count,
+													 "[G1] d2BiChar: " + hw2.D2.BigramChars.Keys.Count,
+													 "[G2] d2TriChar: " + hw2.D2.TrigramChars.Keys.Count,
+													 "[G3] d2TriWord: " + hw2.D2.TrigramsWords.Keys.Count,
+													 "[G1] d3BiChar: " + hw2.D3.BigramChars.Keys.Count,
+													 "[G2] d3TriChar: " + hw2.D3.TrigramChars.Keys.Count,
+													 "[G3] d3TriWord: " + hw2.D3.TrigramsWords.Keys.Count,
+													 "[G1] d4BiChar: " + hw2.D4.BigramChars.Keys.Count,
+													 "[G2] d4TriChar: " + hw2.D4.TrigramChars.Keys.Count,
+													 "[G3] d4TriWord: " + hw2.D4.TrigramsWords.Keys.Count
 				                 };
 			foreach (var statement in statements)
 			{
@@ -107,7 +109,8 @@ namespace DataMining_uu_2012
 				CalculateJaccard(hw2);
 				var mult = new MultiplicativeHash();
 
-				BigramMinHashing(mult, hw2);
+				for (var i = 0; i < 10; i++)
+					BigramMinHashing(mult, hw2);
 
 				Console.ReadLine();
 			}
@@ -123,7 +126,7 @@ namespace DataMining_uu_2012
 				tenDist = BigramMinHash(mult, hw2, tenDist);
 			}
 			stopWatch.Stop();
-			
+
 			tenDist = tenDist / 10;
 			Console.WriteLine("10: " + tenDist + " " + stopWatch.Elapsed.Milliseconds);
 			stopWatch.Reset();
@@ -149,7 +152,7 @@ namespace DataMining_uu_2012
 			stopWatch.Stop();
 			hundredDist = hundredDist / 100;
 			Console.WriteLine("100: " + hundredDist + " " + stopWatch.Elapsed.Milliseconds);
-			
+
 			stopWatch.Reset();
 			double threeHundred = 0;
 			stopWatch.Start();
@@ -179,7 +182,7 @@ namespace DataMining_uu_2012
 
 		private static double BigramMinHash(MultiplicativeHash mult, Hw2 hw2, double dist)
 		{
-			var res = mult.BigramMinHashing(hw2.D1Bigrams, hw2.D2Bigrams);
+			var res = mult.BigramMinHashing(hw2.D1.BigramsWords, hw2.D2.BigramsWords);
 			if (res)
 			{
 				dist++;
@@ -213,7 +216,7 @@ namespace DataMining_uu_2012
 			double uniTenDist = 0;
 			for (var i = 0; i < 10; i++)
 			{
-				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				var res = mult.UnigramMinHashing(hw2.D1UnigramsWords, hw2.D2UnigramsWords);
 				if (res)
 				{
 					uniTenDist++;
@@ -225,7 +228,7 @@ namespace DataMining_uu_2012
 			double uniFiftyDist = 0;
 			for (var i = 0; i < 50; i++)
 			{
-				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				var res = mult.UnigramMinHashing(hw2.D1UnigramsWords, hw2.D2UnigramsWords);
 				if (res)
 				{
 					uniFiftyDist++;
@@ -236,7 +239,7 @@ namespace DataMining_uu_2012
 			double uniHundredDist = 0;
 			for (var i = 0; i < 100; i++)
 			{
-				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				var res = mult.UnigramMinHashing(hw2.D1UnigramsWords, hw2.D2UnigramsWords);
 				if (res)
 				{
 					uniHundredDist++;
@@ -248,7 +251,7 @@ namespace DataMining_uu_2012
 			double uniThreeHundred = 0;
 			for (var i = 0; i < 300; i++)
 			{
-				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				var res = mult.UnigramMinHashing(hw2.D1UnigramsWords, hw2.D2UnigramsWords);
 				if (res)
 				{
 					uniThreeHundred++;
@@ -260,7 +263,7 @@ namespace DataMining_uu_2012
 			double uniSixHundred = 0;
 			for (var i = 0; i < 600; i++)
 			{
-				var res = mult.UnigramMinHashing(hw2.D1Unigrams, hw2.D2Unigrams);
+				var res = mult.UnigramMinHashing(hw2.D1UnigramsWords, hw2.D2UnigramsWords);
 				if (res)
 				{
 					uniSixHundred++;
@@ -320,7 +323,7 @@ namespace DataMining_uu_2012
 
 		private static double TrigramMinHash(MultiplicativeHash mult, Hw2 hw2, double dis)
 		{
-			var res = mult.TrigramMinHashing(hw2.D1Trigrams, hw2.D2Trigrams);
+			var res = mult.TrigramMinHashing(hw2.D1TrigramsWords, hw2.D2TrigramsWords);
 			if (res)
 			{
 				dis++;

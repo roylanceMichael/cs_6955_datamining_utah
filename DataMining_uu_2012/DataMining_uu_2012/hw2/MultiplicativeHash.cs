@@ -23,8 +23,11 @@ namespace DataMining_uu_2012.hw2
 
 		public int MultiplicativeHashFunc(int m, int x)
 		{
-			var frac = this.Frac(x);
-			return Math.Abs(int.Parse(Math.Floor(m * frac).ToString(CultureInfo.InvariantCulture)));
+			var xLong = Int64.Parse(x.ToString());
+			var maxInt = Int64.Parse(int.MaxValue.ToString());
+			var mLong = Int64.Parse(m.ToString());
+			var tempLong = ((xLong + maxInt) % mLong).ToString();
+			return int.Parse(tempLong);
 		}
 
 		public int ConvertToHash(Tuple<string, string> item)
