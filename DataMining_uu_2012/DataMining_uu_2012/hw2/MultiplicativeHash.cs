@@ -14,7 +14,7 @@ namespace DataMining_uu_2012.hw2
 		private const int M = 40127;
 		private static readonly Random RanToUse = new Random();
 
-		public double Frac(int k)
+		public double Frac(long k)
 		{
 			const double A = .83;
 			var res = k * A;
@@ -23,16 +23,26 @@ namespace DataMining_uu_2012.hw2
 
 		public int MultiplicativeHashFunc(int m, int x)
 		{
-			var xLong = Int64.Parse(x.ToString());
-			var maxInt = Int64.Parse(int.MaxValue.ToString());
-			var mLong = Int64.Parse(m.ToString());
-			var tempLong = ((xLong + maxInt) % mLong).ToString();
-			return int.Parse(tempLong);
+			return x;
+
+			//var xLong = Int64.Parse(x.ToString());
+			//var maxInt = Int64.Parse(int.MaxValue.ToString());
+			//var tempLong = xLong + maxInt;
+			//var frac = this.Frac(tempLong);
+			//var res = Math.Floor(m * frac);
+			//return (int)res;
 		}
 
 		public int ConvertToHash(Tuple<string, string> item)
 		{
 			var res = item.Item1 + " " + item.Item2;
+			var hashCode = res.GetHashCode();
+			return hashCode;
+		}
+
+		public int ConvertToHashTrigramChar(Tuple<char, char, char> item)
+		{
+			var res = item.Item1 + item.Item2 + item.Item3;
 			var hashCode = res.GetHashCode();
 			return hashCode;
 		}
@@ -138,6 +148,99 @@ namespace DataMining_uu_2012.hw2
 			var returnBool = d1FirstElement != -1 && d2FirstElement != -1 && d1FirstElement == d2FirstElement;
 
 			return returnBool;
+		}
+
+		public decimal TrigramCharMinHashing(IDictionary<Tuple<char, char, char>, int> d1, IDictionary<Tuple<char, char, char>, int> d2, int hashFunctionCount = 50)
+		{
+			var d1Hashed = d1.Keys.Select(item => this.MultiplicativeHashFunc(M, this.ConvertToHashTrigramChar(item))).ToList();
+			var d2Hashed = d2.Keys.Select(item => this.MultiplicativeHashFunc(M, this.ConvertToHashTrigramChar(item))).ToList();
+			var completeList = new Dictionary<int, int>();
+			foreach (var hash in d1Hashed.Where(hash => !completeList.ContainsKey(hash)))
+			{
+				completeList[hash] = 0;
+			}
+
+			foreach (var hash in d2Hashed.Where(hash => !completeList.ContainsKey(hash)))
+			{
+				completeList[hash] = 0;
+			}
+
+			//create k hash functions
+			var allHashFunctions = new List<IList<int>>();
+			for (var i = 0; i < hashFunctionCount; i++)
+			{
+				allHashFunctions.Add(CreateNewHashFunction(completeList));
+			}
+
+			var c1 = new List<int>();
+			var c2 = new List<int>();
+
+			for (var i = 0; i < hashFunctionCount; i++)
+			{
+				c1.Add(int.MaxValue);
+				c2.Add(int.MaxValue);
+			}
+
+
+			//compare d1 first, then d2
+			//for i = 1 to N
+			for (var i = 0; i < completeList.Count; i++)
+			{
+				//if S(i) = 1
+				if (d1Hashed.Contains(completeList.Keys.ElementAt(i)))
+				{
+					//for j=1 to k do
+					for (var j = 0; j < hashFunctionCount; j++)
+					{
+						if (allHashFunctions[j][i] < c1[j])
+						{
+							c1[j] = allHashFunctions[j][i];
+						}
+					}
+				}
+			}
+
+			for (var i = 0; i < completeList.Count; i++)
+			{
+				//if S(i) = 1
+				if (d2Hashed.Contains(completeList.Keys.ElementAt(i)))
+				{
+					//for j=1 to k do
+					for (var j = 0; j < hashFunctionCount; j++)
+					{
+						var hji = allHashFunctions[j][i];
+						var c2J = c2[j];
+						if (hji < c2J)
+						{
+							c2[j] = allHashFunctions[j][i];
+						}
+					}
+				}
+			}
+
+			if (c1.Count != c2.Count)
+			{
+				throw new Exception("c1 count is different than c2 count!");
+			}
+
+			var total = (decimal)c1.Where((t, i) => t == c2[i]).Count();
+
+			return 1 - ((decimal)1 / c1.Count) * total;
+		}
+
+		private static IList<int> CreateNewHashFunction(IDictionary<int, int> completeList)
+		{
+			var subtractList = new List<int>();
+			var addList = completeList.Keys.ToList();
+
+			//make hard copy
+			while (addList.Count > 0)
+			{
+				var idx = RanToUse.Next(0, addList.Count - 1);
+				subtractList.Add(addList[idx]);
+				addList.RemoveAt(idx);
+			}
+			return subtractList;
 		}
 
 		public bool TrigramMinHashing(IDictionary<Tuple<string, string, string>, int> d1, IDictionary<Tuple<string, string, string>, int> d2)
