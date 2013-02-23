@@ -10,6 +10,8 @@ namespace DataMining_uu_2012.hw2
 	using System.Reflection;
 	using System.Text.RegularExpressions;
 
+	using DataMining_uu_2012.utilities;
+
 	public class Hw2
 	{
 		public const string WhiteSpaceRegex = "\\s+";
@@ -51,10 +53,10 @@ namespace DataMining_uu_2012.hw2
 		public Hw2()
 		{
 			Documents = new List<Document>();
-			var d1 = new Document { D = ReadResource("DataMining_uu_2012.hw2.D1.txt") };
-			var d2 = new Document { D = ReadResource("DataMining_uu_2012.hw2.D2.txt") };
-			var d3 = new Document { D = ReadResource("DataMining_uu_2012.hw2.D3.txt") };
-			var d4 = new Document { D = ReadResource("DataMining_uu_2012.hw2.D4.txt") };
+			var d1 = new Document { D = "DataMining_uu_2012.hw2.D1.txt".ReadResource() };
+			var d2 = new Document { D = "DataMining_uu_2012.hw2.D2.txt".ReadResource() };
+			var d3 = new Document { D = "DataMining_uu_2012.hw2.D3.txt".ReadResource() };
+			var d4 = new Document { D = "DataMining_uu_2012.hw2.D4.txt".ReadResource() };
 
 			Documents.Add(d1);
 			Documents.Add(d2);
@@ -344,23 +346,6 @@ namespace DataMining_uu_2012.hw2
 				}
 			}
 			return trigrams;
-		}
-
-		private static string ReadResource(string resourceLocation)
-		{
-			var assembly = Assembly.GetExecutingAssembly();
-			using (var d1Stream = assembly.GetManifestResourceStream(resourceLocation))
-			{
-				if (d1Stream == null)
-				{
-					return string.Empty;
-				}
-
-				using (var stringReader = new StreamReader(d1Stream))
-				{
-					return stringReader.ReadToEnd();
-				}
-			}
 		}
 	}
 }
