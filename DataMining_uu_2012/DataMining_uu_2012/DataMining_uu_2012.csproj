@@ -56,6 +56,7 @@
     <Compile Include="hw2\Document.cs" />
     <Compile Include="hw2\Hw2.cs" />
     <Compile Include="hw2\MultiplicativeHash.cs" />
+    <Compile Include="hw3\Cluster.cs" />
     <Compile Include="hw3\Hw3.cs" />
     <Compile Include="hw3\Point.cs" />
     <Compile Include="Program.cs" />

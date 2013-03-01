@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataMining_uu_2012.hw3
 {
+	using System.Collections.Generic;
+
 	public class Point
 	{
 		public string Id { get; set; }
@@ -19,11 +17,35 @@ namespace DataMining_uu_2012.hw3
 				return 0;
 			}
 			double output;
-			if (double.TryParse(val, out output))
+			return double.TryParse(val, out output) ? output : 0;
+		}
+
+		public static double Distance(Point a, Point b)
+		{
+			return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
+		}
+
+		public Point ShortestLink(IEnumerable<Point> points)
+		{
+			Point shortestLink = null;
+			var shortestDistance = double.MaxValue;
+			foreach (var point in points)
 			{
-				return output;
+				var tempDistance = Distance(this, point);
+				if (!(tempDistance < shortestDistance))
+				{
+					continue;
+				}
+
+				shortestDistance = tempDistance;
+				shortestLink = point;
 			}
-			return 0;
+			return shortestLink;
+		}
+
+		public override string ToString()
+		{
+			return this.Id + " " + this.X + " " + this.Y;
 		}
 	}
 }

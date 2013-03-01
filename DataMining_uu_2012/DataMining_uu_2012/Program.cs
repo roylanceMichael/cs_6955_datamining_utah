@@ -104,11 +104,7 @@ namespace DataMining_uu_2012
 		static void Main(string[] args)
 		{
 			var argsNotNull = args != null;
-			if (argsNotNull && args.Length > 0 && args.Any(t => t == "Bloomberg"))
-			{
-				BloombergFunc();
-			}
-			else if (argsNotNull && args.Any(t => t == "Hw2"))
+			if (argsNotNull && args.Any(t => t == "Hw2"))
 			{
 				var hw2 = new Hw2();
 				HowManyDistinctNgrams(hw2);
@@ -141,6 +137,7 @@ namespace DataMining_uu_2012
 			else if (argsNotNull && args.Any(t => t == "Hw3"))
 			{
 				var hw3 = new Hw3();
+				Console.ReadLine();
 			}
 		}
 
@@ -191,24 +188,6 @@ namespace DataMining_uu_2012
 		private static decimal TrigramMinHash(MultiplicativeHash mult, Document d1, Document d2, int hashFunctionCount)
 		{
 			return mult.TrigramCharMinHashing(d1.TrigramChars, d2.TrigramChars, hashFunctionCount);
-		}
-
-		private static void BloombergFunc()
-		{
-			Console.WriteLine("Getting all the companies...");
-			var res = Bloomberg.GetAllCompanies();
-
-			//this is going to go once every three hours
-			while (true)
-			{
-				var fileLocation = Directory.GetCurrentDirectory();
-				var newDirectory = Path.Combine(fileLocation, DateTime.Now.ToFileTimeUtc().ToString());
-				Directory.CreateDirectory(newDirectory);
-				ProcessAllCompanies(res, newDirectory);
-				Console.WriteLine("Complete! Now going to sleep for three hours...");
-				//sleep for three hours...
-				Thread.Sleep(new TimeSpan(0, 3, 0, 0, 0));
-			}
 		}
 	}
 }
