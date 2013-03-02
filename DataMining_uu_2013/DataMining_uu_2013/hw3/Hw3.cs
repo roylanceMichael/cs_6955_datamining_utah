@@ -22,7 +22,7 @@ namespace DataMining_uu_2012.hw3
 			C1 = new List<Point>();
 			AddPointsToList(carriageReturnSplitC1, this.C1);
 
-			var c2 = "DataMining_uu_2012.hw3.C1.txt".ReadResource();
+			var c2 = "DataMining_uu_2012.hw3.C2.txt".ReadResource();
 			var carriageReturnSplitC2 = c2.Split('\n');
 			C2 = new List<Point>();
 			AddPointsToList(carriageReturnSplitC2, this.C2);
