@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMining_uu_2012", "DataMining_uu_2012\DataMining_uu_2012.csproj", "{A4B5D5B6-AC60-463F-81EF-36DEB86087C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMining_uu_2013", "DataMining_uu_2012\DataMining_uu_2013.csproj", "{A4B5D5B6-AC60-463F-81EF-36DEB86087C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
