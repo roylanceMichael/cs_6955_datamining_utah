@@ -27,10 +27,109 @@ namespace DataMining_uu_2012.hw3
 			C2 = new List<Point>();
 			AddPointsToList(carriageReturnSplitC2, this.C2);
 
-			this.SingleLink(this.C1);
+			Links(this.C1);
+
+			KMeans(this.C2);
 		}
 
-		private void SingleLink(IEnumerable<Point> points)
+		private static void KMeans(ICollection<Point> points)
+		{
+			// initially choose k points that are likely to be in different clusters
+			// to avoid too much variation in the results, choose c1 as the point a
+			var p1 = points.First(t => t.Id == "a");
+			Point p2 = null;
+			Point p3 = null;
+
+			// find the point that has the largest distance from c1
+			
+			var largestTuple = FindLargestDistanceFromPointTuple(points, p1);
+
+			if (largestTuple.Item1 == null)
+			{
+				return;
+			}
+
+			p2 = largestTuple.Item1;
+
+			var tempPoint = new Point
+												{
+													X = (p1.X + p2.X) / 2,
+													Y = (p1.Y + p2.Y) / 2,
+												};
+
+			largestTuple = FindLargestDistanceFromPointTuple(points, tempPoint);
+
+			if (largestTuple.Item1 == null)
+			{
+				return;
+			}
+
+			p3 = largestTuple.Item1;
+
+			var clusters = new List<Cluster>();
+			var initClusters = new[] { p1, p2, p3 }; 
+			foreach (var point in initClusters)
+			{
+				var cluster = new Cluster();
+				cluster.AddPoint(point);
+				clusters.Add(cluster);
+			}
+
+			// copy to new array, this is a waste I know..
+
+			foreach (var point in points)
+			{
+				if (initClusters.Any(t => t.Id == point.Id))
+				{
+					continue;
+				}
+
+				var closestCluster = new Tuple<Cluster, double>(null, double.MaxValue);
+
+				foreach (var cluster in clusters)
+				{
+					var dist = Point.Distance(cluster.Centroid, point);
+					if (dist < closestCluster.Item2)
+					{
+						closestCluster = new Tuple<Cluster, double>(cluster, dist);
+					}
+				}
+
+				if (closestCluster.Item1 != null)
+				{
+					closestCluster.Item1.AddPoint(point);
+				}
+			}
+
+			PrintClusters(clusters);
+		}
+
+		private static void PrintClusters(IEnumerable<Cluster> clusters)
+		{
+			var sb = new StringBuilder();
+			foreach (var cluster in clusters)
+			{
+				sb.AppendLine(cluster.ToString());
+				sb.AppendLine();
+			}
+			Console.WriteLine(sb);
+		}
+
+		private static Tuple<Point, double> FindLargestDistanceFromPointTuple(IEnumerable<Point> points, Point c1)
+		{
+			var largestTuple = new Tuple<Point, double>(null, double.MinValue);
+			foreach (var point in points.Where(t => t.Id != c1.Id))
+			{
+				var dist = Point.Distance(c1, point);
+				if (dist > largestTuple.Item2)
+				{
+					largestTuple = new Tuple<Point, double>(point, dist);
+				}
+			}
+			return largestTuple;
+		}
+
+		private static void Links(IEnumerable<Point> points)
 		{
 			var singleLinkClusters = new List<Cluster>();
 			var completeLinkClusters = new List<Cluster>();
@@ -68,8 +167,6 @@ namespace DataMining_uu_2012.hw3
 			CompleLinkCluster(completeLinkClusters);
 
 			MeanLinkCluster(meanLinkClusters);
-
-			var res = 0;
 		}
 
 		public static void MeanLinkCluster(ICollection<Cluster> meanLinkClusters)
@@ -96,13 +193,7 @@ namespace DataMining_uu_2012.hw3
 				dictionary.Clear();
 			}
 
-			var sb = new StringBuilder();
-			foreach (var cluster in meanLinkClusters)
-			{
-				sb.AppendLine(cluster.ToString());
-				sb.AppendLine();
-			}
-			Console.WriteLine(sb);
+			PrintClusters(meanLinkClusters);
 		}
 
 		private static void CompleLinkCluster(ICollection<Cluster> completeLinkClusters)
@@ -129,13 +220,7 @@ namespace DataMining_uu_2012.hw3
 				dictionary.Clear();
 			}
 
-			var sb = new StringBuilder();
-			foreach (var cluster in completeLinkClusters)
-			{
-				sb.AppendLine(cluster.ToString());
-				sb.AppendLine();
-			}
-			Console.WriteLine(sb);
+			PrintClusters(completeLinkClusters);
 		}
 
 		private static void SingleLinkCluster(ICollection<Cluster> singleLinkClusters)
@@ -162,14 +247,7 @@ namespace DataMining_uu_2012.hw3
 				dictionary.Clear();
 			}
 
-			var sb = new StringBuilder();
-			foreach (var cluster in singleLinkClusters)
-			{
-				sb.AppendLine(cluster.ToString());
-				sb.AppendLine();
-			}
-			Console.WriteLine(sb);
-			return;
+			PrintClusters(singleLinkClusters);
 		}
 
 		private static void AddPointsToList(IEnumerable<string> carriageReturnSplitC1, ICollection<Point> list)

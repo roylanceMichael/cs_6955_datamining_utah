@@ -15,6 +15,24 @@ namespace DataMining_uu_2012.hw3
 
 		public IList<Point> Points { get; set; } 
 
+		public Point Centroid
+		{
+			get
+			{
+				var tempPoint = new Point();
+				foreach (var point in this.Points)
+				{
+					tempPoint.X = tempPoint.X + point.X;
+					tempPoint.Y = tempPoint.Y + point.Y;
+				}
+
+				tempPoint.X = tempPoint.X / this.Points.Count;
+				tempPoint.Y = tempPoint.Y / this.Points.Count;
+
+				return tempPoint;
+			}
+		}
+
 		public void AddPoint(Point p)
 		{
 			this.Points.Add(p);
