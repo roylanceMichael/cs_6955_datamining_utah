@@ -78,6 +78,7 @@
     <Content Include="hw1\kendo.all.min.js" />
     <Content Include="hw1\kendo.common.min.css" />
     <Content Include="hw1\kendo.default.min.css" />
+    <EmbeddedResource Include="hw3\Test.txt" />
     <EmbeddedResource Include="hw3\C1.txt" />
     <EmbeddedResource Include="hw3\C2.txt" />
     <EmbeddedResource Include="hw2\D1.txt" />

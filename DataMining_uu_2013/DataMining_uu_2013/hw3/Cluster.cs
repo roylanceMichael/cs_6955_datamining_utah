@@ -33,9 +33,29 @@ namespace DataMining_uu_2012.hw3
 			}
 		}
 
+		public void SetClusterCenter(Point point)
+		{
+			if (point == null)
+			{
+				return;
+			}
+			this.ClusterCenter = point;
+		}
+
+		public Point ClusterCenter { get; private set; }
+
 		public void AddPoint(Point p)
 		{
 			this.Points.Add(p);
+		}
+
+		public void RemovePoint(string id)
+		{
+			var pointToRemove = this.Points.FirstOrDefault(t => t.Id == id);
+			if (pointToRemove != null)
+			{
+				this.Points.Remove(pointToRemove);
+			}
 		}
 
 		public void MergeClusters(Cluster c)
