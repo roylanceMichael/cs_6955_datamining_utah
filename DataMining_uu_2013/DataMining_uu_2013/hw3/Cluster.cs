@@ -132,7 +132,7 @@ namespace DataMining_uu_2012.hw3
 			var sb = new StringBuilder();
 			foreach (var point in this.Points)
 			{
-				sb.AppendLine(point.ToString());
+				sb.AppendLine(point + " ");
 			}
 			return sb.ToString();
 		}

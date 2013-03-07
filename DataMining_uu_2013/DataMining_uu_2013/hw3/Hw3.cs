@@ -8,15 +8,20 @@ namespace DataMining_uu_2012.hw3
 {
 	using System.Text.RegularExpressions;
 
+	using DataMining_uu_2012.models;
 	using DataMining_uu_2012.utilities;
+
+	using ZedGraph;
 
 	public class Hw3
 	{
-		private static Random random = new Random();
+		private static readonly Random Random = new Random();
 
 		public IList<Point> C1 { get; private set; }
 		public IList<Point> C2 { get; private set; }
-		public IList<Point> Test { get; private set; }
+
+		public GraphModel KMeansPlusPlusGraphModel { get; set; }
+		public GraphModel LloydsGraphModel { get; set; }
 
 		public Hw3()
 		{
@@ -30,35 +35,273 @@ namespace DataMining_uu_2012.hw3
 			C2 = new List<Point>();
 			AddPointsToList(carriageReturnSplitC2, this.C2);
 
-			var test = "DataMining_uu_2012.hw3.Test.txt".ReadResource();
-			var carriageResturnSplitTest = test.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-			Test = new List<Point>();
-			AddPointsToList(carriageResturnSplitTest, this.Test);
-
-			KMeansPlusPlus(this.C2);
-
-			//KMeans(this.C2);
-
-			//Gonzales3Center(this.C2);
-
-			//Gonzales3Means(this.C2);
-
 			//Links(this.C1);
+			var clusters = new List<Cluster>
+				               {
+					               new Cluster(),
+												 new Cluster(),
+												 new Cluster()
+				               };
+			clusters[0].AddPoint(this.C2[0]);
+			clusters[1].AddPoint(this.C2[1]);
+			clusters[2].AddPoint(this.C2[2]);
 
-			//KMeans(this.C2);
+			Lloyds(this.C2, clusters);
+
+			var gonzalezResult = Gonzales3Center(this.C2);
+			clusters = gonzalezResult.Item3;
+			Lloyds(this.C2, clusters);
+
+			var normalizedGonzalez = Regex.Replace(gonzalezResult.Item2, "\\s+", string.Empty);
+
+			//var iter = 0;
+			//while (!dict.Values.Any(t => t > 0))
+			//{
+			//	var res = KMeansPlusPlus(this.C2);
+			//	if (dict.ContainsKey(res))
+			//	{
+			//		dict[res]++;
+			//	}
+			//	else
+			//	{
+			//		dict[res] = 0;
+			//	}
+			//	iter++;
+			//}
+			//Console.WriteLine(iter);
+
+			var gonzalezCount = 0;
+			var lloydsCount = 0;
+			var gonzalezDict = new Dictionary<double, int>();
+			var lloydsDict = new Dictionary<double, int>();
+			for (var i = 0; i < 300; i++)
+			{
+				var res = KMeansPlusPlus(this.C2);
+
+				var normalizedResult = Regex.Replace(res.Item2, "\\s+", string.Empty);
+				var lloyds = Lloyds(this.C2, res.Item3);
+				var normalizedLloyds = Regex.Replace(lloyds.Item2, "\\s+", string.Empty);
+				if (normalizedResult == normalizedGonzalez)
+				{
+					gonzalezCount++;
+				}
+				if (normalizedResult == normalizedLloyds)
+				{
+					lloydsCount++;
+				}
+
+				if (gonzalezDict.ContainsKey(res.Item1))
+				{
+					gonzalezDict[res.Item1]++;
+				}
+				else
+				{
+					gonzalezDict[res.Item1] = 1;
+				}
+
+				if (lloydsDict.ContainsKey(lloyds.Item1))
+				{
+					lloydsDict[lloyds.Item1]++;
+				}
+				else
+				{
+					lloydsDict[lloyds.Item1] = 1;
+				}
+			}
+
+			var total = gonzalezDict.Values.Sum();
+			var runningTotal = (double)0;
+			var pointList = new PointPairList();
+			foreach (var key in gonzalezDict.OrderBy(t => t.Key).Select(t => t.Key))
+			{
+				runningTotal += gonzalezDict[key];
+				for (var i = 0; i < gonzalezDict[key]; i++)
+				{
+					pointList.Add(key, runningTotal / total);
+				}
+			}
+			this.KMeansPlusPlusGraphModel = new GraphModel
+																				{
+																					TitleText = "KMeans++",
+																					Values = pointList,
+																					XTitleText = "3 Means Cost"
+																				};
+
+			var ltotal = gonzalezDict.Values.Sum();
+			var lrunningTotal = (double)0;
+			var lpointList = new PointPairList();
+			foreach (var key in lloydsDict.OrderBy(t => t.Key).Select(t => t.Key))
+			{
+				lrunningTotal += lloydsDict[key];
+				for (var i = 0; i < lloydsDict[key]; i++)
+				{
+					lpointList.Add(key, lrunningTotal / ltotal);
+				}
+			}
+			this.LloydsGraphModel = new GraphModel
+			{
+				TitleText = "Lloyd's",
+				Values = lpointList,
+				XTitleText = "3 Means Cost"
+			};
+
+			foreach (var d in D)
+			{
+				var l1NormRes = L1Norm(100, d);
+			}
+
+			foreach (var d in D)
+			{
+				var l2NormRes = L2Norm(100, d);
+			}
+
+			foreach (var d in D)
+			{
+				var numTimes = LpDistance(100, d);
+			}
 		}
 
-		private static void Lloyds(IList<Point> points)
+		private static List<int> D = new List<int> { 1, 2, 3, 5, 10, 50, 100 };
+		#region box-muller
+		private static double L1Norm(int tVal, int dVal)
+		{
+			double sum = 0.0;
+			for (var t = 0; t < tVal; t++)
+			{
+				double i;
+				if (t % 2 == 0)
+				{
+					i = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Cos(2.0 * Math.PI * Random.NextDouble());
+				}
+				else
+				{
+					i = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Sin(2.0 * Math.PI * Random.NextDouble());
+				}
+				for (var d = 0; d < dVal; d++)
+				{
+					double j;
+					if (d % 2 == 0)
+					{
+						j = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Cos(2.0 * Math.PI * Random.NextDouble());
+					}
+					else
+					{
+						j = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Sin(2.0 * Math.PI * Random.NextDouble());
+					}
+
+					sum += Math.Sqrt(Math.Pow(i - j, 2));
+				}
+			}
+
+			return sum;
+		}
+
+		private static double L2Norm(int tVal, int dVal)
+		{
+			double sum = 0.0;
+			for (var t = 0; t < tVal; t++)
+			{
+				double i;
+				if (t % 2 == 0)
+				{
+					i = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Cos(2.0 * Math.PI * Random.NextDouble());
+				}
+				else
+				{
+					i = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Sin(2.0 * Math.PI * Random.NextDouble());
+				}
+				for (var d = 0; d < dVal; d++)
+				{
+					double j;
+					if (d % 2 == 0)
+					{
+						j = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Cos(2.0 * Math.PI * Random.NextDouble());
+					}
+					else
+					{
+						j = Math.Sqrt(-2.0 * Math.Log(Random.NextDouble())) * Math.Sin(2.0 * Math.PI * Random.NextDouble());
+					}
+
+					sum += Math.Abs(i - j);
+				}
+			}
+			return sum / tVal;
+		}
+
+		private static double LpDistance(int tVal, int dVal)
+		{
+			var numberOfTimesDistanceIsLessThan1 = 0.0;
+			for (var t = 0; t < tVal; t++)
+			{
+				for (var d = 0; d < dVal; d++)
+				{
+					var y1 = Random.NextDouble() * 2 - 1;
+					var y2 = Random.NextDouble() * 2 - 1;
+					if (Math.Abs(y1 + y2) > 1)
+					{
+						numberOfTimesDistanceIsLessThan1++;
+					}
+				}
+				numberOfTimesDistanceIsLessThan1 = numberOfTimesDistanceIsLessThan1 / dVal;
+			}
+			return numberOfTimesDistanceIsLessThan1 / tVal;
+		}
+		#endregion
+
+		#region Lloyds
+		private static Tuple<double, string> Lloyds(IList<Point> points, IList<Cluster> clusters)
 		{
 			// choose k points for clusters arbitrarily?
 			// repeat
-				// for all point in points, find phiC(x) (closest center c in C to x)
-				// for i in j (points.count?), let ci = average of the points located in it...
+			// for all point in points, find phiC(x) (closest center c in C to x)
+			// for i in j (points.count?), let ci = average of the points located in it...
 			// until the set C is unchanged...
+			//lets just add the rest into the first cluster...
+			for (var i = 3; i < points.Count; i++)
+			{
+				clusters[0].AddPoint(points[i]);
+			}
+
+			var cost = 0.0;
+			var movements = 1;
+			while (movements > 0)
+			{
+				movements = 0;
+
+				foreach (var cluster in clusters)
+				{
+					for (var i = 0; i < cluster.Points.Count; i++)
+					{
+						var point = cluster.Points[i];
+						var nearestClusterIndex = FindClosestCluster(point, clusters);
+						if (nearestClusterIndex.Item1 != clusters.IndexOf(cluster))
+						{
+							if (cluster.Points.Count > 1 && clusters[nearestClusterIndex.Item1].Points.All(t => t.Id != point.Id))
+							{
+								cluster.RemovePoint(point.Id);
+								clusters[nearestClusterIndex.Item1].AddPoint(point);
+								movements++;
+								cost += nearestClusterIndex.Item2;
+							}
+						}
+					}
+				}
+			}
+
+			var sb = new StringBuilder();
+			foreach (var cluster in clusters)
+			{
+				sb.Append(cluster);
+				sb.AppendLine();
+			}
+
+			return new Tuple<double, string>(cost, sb.ToString());
 		}
+		#endregion
 
 		#region KMeans++
-		private static void KMeansPlusPlus(IList<Point> points)
+
+		private static Tuple<double, string, List<Cluster>> KMeansPlusPlus(IList<Point> points)
 		{
 			var phi = new int[points.Count];
 			//choose c1 in X arbitrarily
@@ -66,6 +309,7 @@ namespace DataMining_uu_2012.hw3
 			clusters[0] = points[0];
 			//get a random
 			//select 1 random points
+			var threeCenterCost = 0.0;
 			for (var i = 1; i < 3; i++)
 			{
 				var prevCluster = clusters[i - 1];
@@ -77,7 +321,7 @@ namespace DataMining_uu_2012.hw3
 					probTuples.Add(new Tuple<Point, double>(points[j], dist * dist));
 				}
 				var total = probTuples.Sum(t => t.Item2);
-				var nextCluster = random.NextDouble();
+				var nextCluster = Random.NextDouble();
 
 				var runningTotal = (double)0;
 				foreach (var tuple in probTuples)
@@ -86,6 +330,7 @@ namespace DataMining_uu_2012.hw3
 					if (nextCluster <= runningTotal)
 					{
 						clusters[i] = tuple.Item1;
+						threeCenterCost += tuple.Item2;
 						break;
 					}
 				}
@@ -108,10 +353,50 @@ namespace DataMining_uu_2012.hw3
 					}
 				}
 			}
+
+			var sb = new StringBuilder();
+			for (var i = 0; i < clusters.Length; i++)
+			{
+				for (var j = 0; j < points.Count; j++)
+				{
+					if (phi[j] == i)
+					{
+						sb.AppendLine(points[j].ToString());
+					}
+				}
+				sb.AppendLine();
+			}
+			var c1 = new Cluster();
+			var c2 = new Cluster();
+			var c3 = new Cluster();
+			c1.AddPoint(clusters[0]);
+			c2.AddPoint(clusters[1]);
+			c3.AddPoint(clusters[2]);
+
+			return new Tuple<double, string, List<Cluster>>(
+				threeCenterCost, sb.ToString(), new List<Cluster> { c1, c2, c3 });
 		}
 		#endregion
 
 		#region Helper Functions
+		private static Tuple<int, double> FindClosestCluster(Point point, IList<Cluster> clusters)
+		{
+			var minimumDistance = double.MaxValue;
+			var nearestNeighborIndex = -1;
+
+			for (var i = 0; i < clusters.Count; i++)
+			{
+				var dist = Point.Distance(point, clusters[i].Centroid);
+				dist = dist * dist;
+				if (minimumDistance > dist)
+				{
+					minimumDistance = dist;
+					nearestNeighborIndex = i;
+				}
+			}
+
+			return new Tuple<int, double>(nearestNeighborIndex, minimumDistance);
+		}
 		// C(x) = arg minc2C d(x; c)
 		private static Point PhiC(Point x, IEnumerable<Point> clusters)
 		{
@@ -132,27 +417,10 @@ namespace DataMining_uu_2012.hw3
 		#endregion
 
 		#region Gonzales 3 Functions
-		private static void Gonzales3Means(IList<Point> points)
-		{
-			// find the point as the center of the first cluster
-			var cPhi = new Point[3];
-			cPhi[0] = points[0];
-			var minimumDist = double.MaxValue;
-			foreach (var point in points.Where(t => t != cPhi[0]))
-			{
-				var dist = Point.Distance(point, cPhi[0]);
-				var res = dist * dist;
-				if (res < minimumDist)
-				{
-					minimumDist = res;
-					cPhi[1] = point;
-				}
-			}
-		}
-
-		private static void Gonzales3Center(IList<Point> points)
+		private static Tuple<double, string, List<Cluster>> Gonzales3Center(IList<Point> points)
 		{
 			var phi = new int[points.Count];
+			var cost = 0.0;
 			for (var i = 0; i < points.Count; i++)
 			{
 				phi[i] = 0;
@@ -162,22 +430,48 @@ namespace DataMining_uu_2012.hw3
 
 			cPhi[0] = points[0];
 
-			for (var i = 1; i < 3; i++)
+			var m1 = (double)0;
+			cPhi[1] = points[0];
+			// find the furthest point from A 
+			foreach (var point in points)
 			{
-				var m = (double)0;
-				cPhi[i] = points[0];
-				var prevCluster = cPhi[i - 1];
-				//just show me the cluster that has the highest distance to i-1...
-				foreach (var point in points)
+				var dist = Point.Distance(point, cPhi[0]);
+				if (dist > m1)
 				{
-					var dist = Point.Distance(point, prevCluster);
-					if (dist > m)
-					{
-						m = dist;
-						cPhi[i] = point;
-					}
+					m1 = dist;
+					cPhi[1] = point;
 				}
 			}
+			cost += m1;
+			// update all the clusters now to be in either 1 or 2
+			for (var i = 0; i < points.Count; i++)
+			{
+				var point = points[i];
+				var dist1 = Point.Distance(point, cPhi[0]);
+				var dist2 = Point.Distance(point, cPhi[1]);
+				if (dist1 > dist2)
+				{
+					phi[i] = 1;
+				}
+			}
+
+			var tempCenter = new Point { X = (cPhi[0].X + cPhi[1].X) / 2, Y = (cPhi[0].Y + cPhi[1].Y) / 2 };
+
+			var furthestCluster = GonzalezFurthestCluster(points, phi, tempCenter);
+
+			cPhi[2] = points[furthestCluster.Item1];
+
+			//var furthestCluster1 = GonzalezFurthestCluster(points, phi, cPhi[0]);
+			//var furthestCluster2 = GonzalezFurthestCluster(points, phi, cPhi[1]);
+
+			//if (furthestCluster1.Item2 > furthestCluster2.Item2)
+			//{
+			//	cPhi[2] = points[furthestCluster1.Item1];
+			//}
+			//else
+			//{
+			//	cPhi[2] = points[furthestCluster2.Item1];
+			//}
 
 			for (var j = 0; j < points.Count; j++)
 			{
@@ -192,7 +486,52 @@ namespace DataMining_uu_2012.hw3
 					}
 				}
 			}
+
+			cost += m1;
+
+			var sb = new StringBuilder();
+			for (var i = 0; i < cPhi.Length; i++)
+			{
+				for (var j = 0; j < points.Count; j++)
+				{
+					if (phi[j] == i)
+					{
+						sb.AppendLine(points[j].ToString());
+					}
+				}
+				sb.AppendLine();
+			}
+
+			var c1 = new Cluster();
+			c1.AddPoint(cPhi[0]);
+			var c2 = new Cluster();
+			c2.AddPoint(cPhi[1]);
+			var c3 = new Cluster();
+			c3.AddPoint(cPhi[2]);
+
+			return new Tuple<double, string, List<Cluster>>(cost, sb.ToString(), new List<Cluster> { c1, c2, c3 });
 		}
+
+		private static Tuple<int, double> GonzalezFurthestCluster(IList<Point> points, int[] phi, Point tempCenter)
+		{
+			var furthestCluster = new Tuple<int, double>(0, double.MaxValue);
+
+			for (var i = 0; i < phi.Length; i++)
+			{
+				var dist = Point.Distance(points[i], tempCenter);
+				if (dist < .000001)
+				{
+					continue;
+				}
+
+				if (dist < furthestCluster.Item2)
+				{
+					furthestCluster = new Tuple<int, double>(i, dist);
+				}
+			}
+			return furthestCluster;
+		}
+
 		#endregion
 
 		#region KMeans
@@ -268,7 +607,7 @@ namespace DataMining_uu_2012.hw3
 			PrintClusters(clusters);
 		}
 		#endregion
-		
+
 		private static void PrintClusters(IEnumerable<Cluster> clusters)
 		{
 			var sb = new StringBuilder();
