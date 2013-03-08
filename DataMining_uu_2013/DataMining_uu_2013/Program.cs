@@ -13,6 +13,7 @@ namespace DataMining_uu_2012
 	using DataMining_uu_2012.hw1;
 	using DataMining_uu_2012.hw2;
 	using DataMining_uu_2012.hw3;
+	using DataMining_uu_2012.hw4;
 	using DataMining_uu_2012.project;
 	using DataMining_uu_2012.utilities;
 
@@ -137,6 +138,11 @@ namespace DataMining_uu_2012
 			else if (argsNotNull && args.Any(t => t == "Hw3"))
 			{
 				var hw3 = new Hw3();
+				Console.ReadLine();
+			}
+			else if (argsNotNull && args.Any(t => t == "Hw4"))
+			{
+				var hw4 = new Hw4();
 				Console.ReadLine();
 			}
 		}

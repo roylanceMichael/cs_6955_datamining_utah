@@ -63,6 +63,7 @@
     <Compile Include="hw3\Cluster.cs" />
     <Compile Include="hw3\Hw3.cs" />
     <Compile Include="hw3\Point.cs" />
+    <Compile Include="hw4\Hw4.cs" />
     <Compile Include="models\GraphModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="project\Bloomberg.cs" />
@@ -84,6 +85,8 @@
     <Content Include="hw1\kendo.all.min.js" />
     <Content Include="hw1\kendo.common.min.css" />
     <Content Include="hw1\kendo.default.min.css" />
+    <EmbeddedResource Include="hw4\S1.txt" />
+    <EmbeddedResource Include="hw4\S2.txt" />
     <EmbeddedResource Include="hw3\Test.txt" />
     <EmbeddedResource Include="hw3\C1.txt" />
     <EmbeddedResource Include="hw3\C2.txt" />
