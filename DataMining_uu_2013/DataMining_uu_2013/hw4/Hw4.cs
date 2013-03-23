@@ -118,6 +118,13 @@ namespace DataMining_uu_2012.hw4
 			}
 		}
 
+        //I need a function that will map from any integer to any number within k
+        //IE 
+        private static int h1(int v, int k)
+        {
+            return v + 5;
+        }
+
 		private static string Majority(IEnumerable<string> listOfItems)
 		{
 			var c = -1;
