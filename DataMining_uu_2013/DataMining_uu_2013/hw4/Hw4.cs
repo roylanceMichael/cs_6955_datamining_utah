@@ -25,6 +25,16 @@ namespace DataMining_uu_2012.hw4
 				}
 			}
 		}
+
+		public void SetValue(int column, int row, int value)
+		{
+			this.matrix[row][column] = value;
+		}
+
+		public int GetValue(int column, int row)
+		{
+			return this.matrix[row][column];
+		}
 	}
 
 	public class Hw4
@@ -103,27 +113,66 @@ namespace DataMining_uu_2012.hw4
 				mg2 += this.MisaGriesS2.Item2[i] + " : " + this.MisaGriesS2.Item1[i] + Environment.NewLine;
 			}
 			Console.WriteLine(mg2);
-		}
 
-		private static void CountMinSketch(IReadOnlyCollection<string> listOfM, int k, int t)
-		{
-			var counterMatrix = new Matrix(t, k);
-
-			for (var i = 0; i < listOfM.Count; i++)
+			var countMinDict = CountMinSketch(this.S1, 10, 5);
+			var sb = new StringBuilder();
+			foreach (var item in countMinDict)
 			{
-				for (var j = 0; j < t; j++)
-				{
-					
-				}
+				sb.AppendLine(item.Key + " : " + item.Value);
+			}
+
+			var countMinDict1 = CountMinSketch(this.S1, 10, 5);
+			var sb1 = new StringBuilder();
+			foreach (var item in countMinDict1)
+			{
+				sb1.AppendLine(item.Key + " : " + item.Value);
 			}
 		}
 
-        //I need a function that will map from any integer to any number within k
-        //IE 
-        private static int h1(int v, int k)
-        {
-            return v + 5;
-        }
+		private static Dictionary<string, int> CountMinSketch(IReadOnlyCollection<string> listOfM, int k, int t)
+		{
+			var counterMatrix = new Matrix(t, k);
+			//map it out first
+			var mMap = new Dictionary<string, int>();
+			var distinctM = listOfM.Distinct().ToList();
+			for (var i = 0; i < distinctM.Count; i++)
+			{
+				mMap[distinctM[i]] = i;
+			}
+
+			var hashFunctions = HashUtil.HashFunctions(t, k, mMap.Keys.Count).ToList();
+
+			for (var i = 0; i < listOfM.Count; i++)
+			{
+				var mapResult = mMap[listOfM.ElementAt(i)];
+
+				for (var j = 0; j < t; j++)
+				{
+					var hashFunctionResult = hashFunctions[j][mapResult];
+					counterMatrix.SetValue(hashFunctionResult, j,
+						counterMatrix.GetValue(hashFunctionResult, j) + 1
+						);
+				}
+			}
+
+			var resultDictionary = new Dictionary<string, int>();
+
+			foreach(var kvp in mMap)
+			{
+				var minResult = int.MaxValue;
+				for (var i = 0; i < t; i++)
+				{
+					var hashMap = hashFunctions[i][kvp.Value];
+					var tempResult = counterMatrix.GetValue(hashMap, i);
+					if (tempResult < minResult)
+					{
+						minResult = tempResult;
+					}
+				}
+				resultDictionary[kvp.Key] = minResult;
+			}
+			return resultDictionary;
+		}
 
 		private static string Majority(IEnumerable<string> listOfItems)
 		{
@@ -158,6 +207,7 @@ namespace DataMining_uu_2012.hw4
 
 			var c = new List<int>(k);
 			var l = new List<string>(k);
+			var m = listOfItems.Count;
 
 			for (var idx = 0; idx < k; idx++)
 			{
@@ -165,7 +215,7 @@ namespace DataMining_uu_2012.hw4
 				l.Add(string.Empty);
 			}
 
-			for (var i = 0; i < listOfItems.Count(); i++)
+			for (var i = 0; i < m; i++)
 			{
 				var j = l.IndexOf(listOfItems[i]);
 
